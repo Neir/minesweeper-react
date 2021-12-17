@@ -4,7 +4,7 @@ export type Cells = Array<Cell>;
 
 export class Grid {
     [key: number]: number;
-    private _column: number;
+    private readonly _column: number;
     private _cells: Cells;
 
     static generate(row: number, column: number, minesCount: number): Grid {
@@ -57,13 +57,6 @@ export class Grid {
         return this._cells[index];
     }
 
-    cellByCoordinates(x: number, y: number): Cell | undefined {
-        if (x < 0 || x >= this.column || y < 0 || y >= this.column) {
-            return undefined;
-        }
-        return this._cells[this.column * y + x];
-    }
-
     coordinatesByCellIndex(index: number): [number, number] {
         return [
             index % this.column,
@@ -71,38 +64,59 @@ export class Grid {
         ];
     }
 
-    getNeighborCells(cellIndex: number): Cell[] {
+    cellIndexByCoordinates(x: number, y: number): number {
+        if (x < 0 || x >= this.column || y < 0 || y >= this.column) {
+            return -1;
+        }
+        return this.column * y + x;
+    }
+    getNeighborCellIndexes(cellIndex: number): number[] {
         const [cellX, cellY] = this.coordinatesByCellIndex(cellIndex);
 
         const neighborCells = [
-            this.cellByCoordinates(cellX - 1, cellY - 1),
-            this.cellByCoordinates(cellX - 1, cellY),
-            this.cellByCoordinates(cellX - 1, cellY + 1),
-            this.cellByCoordinates(cellX, cellY - 1),
-            this.cellByCoordinates(cellX, cellY + 1),
-            this.cellByCoordinates(cellX + 1, cellY - 1),
-            this.cellByCoordinates(cellX + 1, cellY),
-            this.cellByCoordinates(cellX + 1, cellY + 1),
+            this.cellIndexByCoordinates(cellX - 1, cellY - 1),
+            this.cellIndexByCoordinates(cellX - 1, cellY),
+            this.cellIndexByCoordinates(cellX - 1, cellY + 1),
+            this.cellIndexByCoordinates(cellX, cellY - 1),
+            this.cellIndexByCoordinates(cellX, cellY + 1),
+            this.cellIndexByCoordinates(cellX + 1, cellY - 1),
+            this.cellIndexByCoordinates(cellX + 1, cellY),
+            this.cellIndexByCoordinates(cellX + 1, cellY + 1),
         ];
 
-        return neighborCells.filter(cell => !!cell) as Cell[];
+        return neighborCells.filter(cell => cell !== -1);
     }
 
-    countNeighborBombs(cellIndex: number) {
-        return this.getNeighborCells(cellIndex)
-            .filter(cell => cell.containsBomb).length;
+    countNeighborBombs(cellIndex: number, cells: Cell[]): number {
+        return this.getNeighborCellIndexes(cellIndex)
+            .filter((neighborIndex: number) =>
+                cells[neighborIndex]?.containsBomb
+            ).length;
     }
 
     sendActionToCell(cellIndex: number, action: CellAction): Grid {
         const cells = [...this._cells];
         const cell = cells[cellIndex];
 
-        cells[cellIndex] = cell[action]();
-
         if (action === 'dig') {
-            cells[cellIndex].hint = this.countNeighborBombs(cellIndex);
+            this.digInCascadeWithHint(cellIndex, cells);
+        } else {
+            cells[cellIndex] = cell[action]();
         }
-        return new Grid(this._column, cells);
+        return new Grid(this.column, cells);
+    }
+
+    digInCascadeWithHint(cellIndex: number, cells: Cell[]): void {
+        cells[cellIndex] = cells[cellIndex].dig();
+        cells[cellIndex].hint = this.countNeighborBombs(cellIndex, cells);
+        if (cells[cellIndex].hint === 0) {
+            this.getNeighborCellIndexes(cellIndex)
+                .filter((neighborIndex: number) =>
+                    cells[neighborIndex].hint === -1)
+                .forEach((neighborIndex: number) =>
+                    this.digInCascadeWithHint(neighborIndex, cells)
+            );
+        }
     }
 
     isDefeated = () => {

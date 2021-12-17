@@ -21,6 +21,7 @@
     "@types/uuid": "^7.0.0",
     "css-loader": "^5.1.1",
     "jest": "^25.1.0",
+    "jest-extended": "^1.2.0",
     "style-loader": "^2.0.0",
     "ts-jest": "^25.2.1",
     "ts-loader": "^6.2.1",

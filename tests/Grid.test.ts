@@ -1,5 +1,6 @@
 import { Grid } from '../src/Domain/Grid';
 import { Cell } from '../src/Domain/Cell';
+import 'jest-extended';
 
 describe(Grid, () => {
     const expected = Cell.withBomb();
@@ -9,21 +10,22 @@ describe(Grid, () => {
         expect(() => new Grid(2, [])).toThrowError(RangeError);
     });
 
-    describe('getByCoordinate', () => {
+    describe('cellIndexByCoordinates', () => {
         test('it get the first cell in grid when asking for x:0 y:0', () => {
-            const grid = new Grid(5, [
+            const cells = [
                 expected,
                 unexpected,
                 unexpected,
                 unexpected,
                 unexpected,
-            ]);
+            ];
+            const grid = new Grid(5, cells);
 
-            expect(grid.cellByCoordinates(0, 0)).toBe(expected);
+            expect(cells[grid.cellIndexByCoordinates(0, 0)]).toBe(expected);
         });
 
         test('it get the last cell in grid when asking for x:3 y:1', () => {
-            const grid = new Grid(4, [
+            const cells = [
                 unexpected,
                 unexpected,
                 unexpected,
@@ -32,30 +34,30 @@ describe(Grid, () => {
                 unexpected,
                 unexpected,
                 expected,
-            ]);
+            ];
+            const grid = new Grid(4, cells);
 
-            const cell = grid.cellByCoordinates(3, 1);
-            expect(cell).toBe(expected);
+            expect(cells[grid.cellIndexByCoordinates(3, 1)]).toBe(expected);
         });
 
-        test('it return undefined when the coordinates are out of the grid', () => {
+        test('it return -1 when the coordinates are out of the grid', () => {
             const grid = new Grid(1, [
                 unexpected,
                 unexpected,
                 unexpected,
             ]);
 
-            expect(grid.cellByCoordinates(1, 1)).toBe(undefined);
+            expect(grid.cellIndexByCoordinates(1, 1)).toBe(-1);
         });
 
-        test('it return undefined when a coordinate is negative', () => {
+        test('it return -1 when a coordinate is negative', () => {
             const grid = new Grid(1, [
                 unexpected,
                 unexpected,
                 unexpected,
             ]);
 
-            expect(grid.cellByCoordinates(- 1, 1)).toBe(undefined);
+            expect(grid.cellIndexByCoordinates(- 1, 1)).toBe(-1);
         });
     });
 
@@ -98,105 +100,183 @@ describe(Grid, () => {
         });
     });
 
-    describe('getNeighbors', () => {
+    describe('getNeighborCellIndexes', () => {
         const selected = Cell.withoutBomb();
         test('it return 8 neighbors when the cell is not on a border', () => {
-            const grid = new Grid(3, [
+            const cells = [
                 expected, expected, expected,
                 expected, selected, expected,
                 expected, expected, expected,
-            ]);
+            ];
+            const grid = new Grid(3, cells);
 
-            expect(grid.getNeighborCells(4)).toEqual([
-                expected,
-                expected,
-                expected,
-                expected,
-                expected,
-                expected,
-                expected,
-                expected,
-            ]);
+            const cellIndexes = grid.getNeighborCellIndexes(4)
+
+            expect(cellIndexes).toIncludeSameMembers([0, 1, 2, 3, 5, 6, 7, 8]);
+            cellIndexes.forEach((cellIndex: number) =>
+                expect(cells[cellIndex]).toBe(expected)
+            );
         });
         test('it return 5 neighbors when 3 are out of grid', () => {
-            const grid = new Grid(3, [
+            const cells = [
                 unexpected, unexpected, unexpected,
                  expected,   expected,   expected,
                  expected,   selected,   expected,
-            ]);
+            ];
+            const grid = new Grid(3, cells);
 
-            expect(grid.getNeighborCells(7)).toEqual([
-                expected,
-                expected,
-                expected,
-                expected,
-                expected,
-            ]);
+            const cellIndexes = grid.getNeighborCellIndexes(7)
+
+            expect(cellIndexes).toIncludeSameMembers([3, 4, 5, 6, 8]);
+            cellIndexes.forEach((cellIndex: number) =>
+                expect(cells[cellIndex]).toBe(expected)
+            );
         });
 
         test('it return 3 neighbors when 5 are out of grid (top left corner)', () => {
-            const grid = new Grid(3, [
+            const cells = [
                  selected,   expected,  unexpected,
                  expected,   expected,  unexpected,
                 unexpected, unexpected, unexpected,
-            ]);
+            ];
+            const grid = new Grid(3, cells);
 
-            expect(grid.getNeighborCells(0)).toEqual([
-                expected,
-                expected,
-                expected,
-            ]);
+            const cellIndexes = grid.getNeighborCellIndexes(0);
+            expect(cellIndexes).toIncludeSameMembers([1, 3, 4]);
+            cellIndexes.forEach((cellIndex: number) =>
+                expect(cells[cellIndex]).toBe(expected)
+            );
         });
 
         test('it return 3 neighbors when 5 are out of grid (bottom right corner)', () => {
-            const grid = new Grid(3, [
+            const cells = [
                 unexpected, unexpected, unexpected,
                 unexpected,  expected,   expected,
                 unexpected,  expected,   selected,
-            ]);
+            ];
+            const grid = new Grid(3, cells);
 
-            expect(grid.getNeighborCells(8)).toEqual([
-                expected,
-                expected,
-                expected,
-            ]);
+            const cellIndexes = grid.getNeighborCellIndexes(8);
+
+            expect(cellIndexes).toIncludeSameMembers([4, 5, 7]);
+            cellIndexes.forEach((cellIndex: number) =>
+                expect(cells[cellIndex]).toBe(expected)
+            );
         });
     });
 
     describe('countNeighborBombs', () => {
-        const CL = Cell.withoutBomb();
+        const SC = Cell.withoutBomb();  // Selected Cell
         const __ = Cell.withoutBomb();
         const $$ = Cell.withBomb();
 
         test('it get none bombs when the cell is away from bombs', () => {
-            const grid = new Grid(3, [
-                CL, __, $$,
+            const cells = [
+                SC, __, $$,
                 __, __, $$,
                 $$, $$, $$,
-            ]);
+            ];
+            const grid = new Grid(3, cells);
 
-            expect(grid.countNeighborBombs(0)).toBe(0);
+            expect(grid.countNeighborBombs(0, cells)).toBe(0);
         });
 
         test('it get 2 bombs when the cell has 2 neighbors containing bomb', () => {
-            const grid = new Grid(3, [
-                __, CL, $$,
+            const cells = [
+                __, SC, $$,
                 __, __, $$,
                 $$, $$, $$,
-            ]);
+            ];
+            const grid = new Grid(3, cells);
 
-            expect(grid.countNeighborBombs(1)).toBe(2);
+            expect(grid.countNeighborBombs(1, cells)).toBe(2);
         });
 
         test('it get 8 bombs when all the neighbors contains bomb', () => {
-            const grid = new Grid(3, [
+            const cells = [
                 $$, $$, $$,
-                $$, CL, $$,
+                $$, SC, $$,
                 $$, $$, $$,
+            ];
+            const grid = new Grid(3, cells);
+
+
+            expect(grid.countNeighborBombs(4, cells)).toBe(8);
+        });
+    });
+
+    describe('digInCascadeWithHint', () => {
+        const SC = Cell.withoutBomb(); // Selected Cell
+        const __ = Cell.withoutBomb();
+        const $$ = Cell.withBomb();
+
+        it('it dig only the selected cell when the cell is close to bomb', () => {
+            const cells = [
+                SC, $$, $$,
+                $$, $$, $$,
+                $$, $$, $$,
+            ];
+
+            const grid = new Grid(3, cells);
+
+            grid.digInCascadeWithHint(0, cells);
+
+            expect(cells.map(cell => cell.status)).toIncludeSameMembers([
+                   'dug',    'untouched', 'untouched',
+                'untouched', 'untouched', 'untouched',
+                'untouched', 'untouched', 'untouched'
             ]);
+            expect(cells.map(cell => cell.hint)).toIncludeSameMembers([
+                3, -1, -1,
+                -1, -1, -1,
+                -1, -1, -1
+            ]);
+        });
 
+        it('it dig all the cells when the grid contains no bomb', () => {
+            const cells = [
+                SC, __, __,
+                __, __, __,
+                __, __, __,
+            ];
 
-            expect(grid.countNeighborBombs(4)).toBe(8);
+            const grid = new Grid(3, cells);
+
+            grid.digInCascadeWithHint(0, cells);
+
+            expect(cells.map(cell => cell.status)).toIncludeSameMembers([
+                'dug', 'dug', 'dug',
+                'dug', 'dug', 'dug',
+                'dug', 'dug', 'dug'
+            ]);
+            expect(cells.map(cell => cell.hint)).toIncludeSameMembers([
+                0, 0, 0,
+                0, 0, 0,
+                0, 0, 0
+            ]);
+        });
+
+        it('it dig the neighboring cells without bomb and mark hint on cells close to bomb', () => {
+            const cells = [
+                SC, __, $$,
+                __, __, $$,
+                $$, $$, $$,
+            ];
+
+            const grid = new Grid(3, cells);
+
+            grid.digInCascadeWithHint(0, cells);
+
+            expect(cells.map(cell => cell.status)).toIncludeSameMembers([
+                   'dug',       'dug',    'untouched',
+                   'dug',       'dug',    'untouched',
+                'untouched', 'untouched', 'untouched'
+            ]);
+            expect(cells.map(cell => cell.hint)).toIncludeSameMembers([
+               0, 2, -1,
+               2, 5, -1,
+               -1, -1, -1
+            ]);
         });
     });
 

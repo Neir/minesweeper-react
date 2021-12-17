@@ -19,7 +19,7 @@ export class Cell {
         this._bomb = withBomb;
         this._flagged = flagged;
         this._dug = dug;
-        this._hint = 0;
+        this._hint = -1;
     }
 
     flag(): Cell {
