@@ -5,6 +5,7 @@ export class Cell {
     private _bomb: boolean;
     private _flagged: boolean;
     private _dug: boolean;
+    private _hint: number;
 
     static withBomb(): Cell {
         return new Cell(true, false, false);
@@ -18,6 +19,7 @@ export class Cell {
         this._bomb = withBomb;
         this._flagged = flagged;
         this._dug = dug;
+        this._hint = 0;
     }
 
     flag(): Cell {
@@ -45,6 +47,14 @@ export class Cell {
 
     get containsBomb(): boolean {
         return this._bomb;
+    }
+
+    get hint(): number {
+        return this._hint;
+    }
+
+    set hint(hint: number) {
+        this._hint = hint;
     }
 
     get status(): CellStatus {

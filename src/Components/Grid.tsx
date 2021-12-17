@@ -37,6 +37,7 @@ export const Grid: React.FunctionComponent = () => {
                                 ? 'warning'
                                 : cell.status
                         }
+                        hint={cell.hint}
                         onclick={(ev: MouseEvent) =>
                             handleClick(index, ev.button)
                         }

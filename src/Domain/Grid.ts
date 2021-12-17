@@ -57,8 +57,40 @@ export class Grid {
         return this._cells[index];
     }
 
-    cellByCoodinates(x: number, y: number): Cell | undefined {
-        return this._cells[this._column * y + x];
+    cellByCoordinates(x: number, y: number): Cell | undefined {
+        if (x < 0 || x >= this.column || y < 0 || y >= this.column) {
+            return undefined;
+        }
+        return this._cells[this.column * y + x];
+    }
+
+    coordinatesByCellIndex(index: number): [number, number] {
+        return [
+            index % this.column,
+            Math.floor(index / this.column),
+        ];
+    }
+
+    getNeighborCells(cellIndex: number): Cell[] {
+        const [cellX, cellY] = this.coordinatesByCellIndex(cellIndex);
+
+        const neighborCells = [
+            this.cellByCoordinates(cellX - 1, cellY - 1),
+            this.cellByCoordinates(cellX - 1, cellY),
+            this.cellByCoordinates(cellX - 1, cellY + 1),
+            this.cellByCoordinates(cellX, cellY - 1),
+            this.cellByCoordinates(cellX, cellY + 1),
+            this.cellByCoordinates(cellX + 1, cellY - 1),
+            this.cellByCoordinates(cellX + 1, cellY),
+            this.cellByCoordinates(cellX + 1, cellY + 1),
+        ];
+
+        return neighborCells.filter(cell => !!cell) as Cell[];
+    }
+
+    countNeighborBombs(cellIndex: number) {
+        return this.getNeighborCells(cellIndex)
+            .filter(cell => cell.containsBomb).length;
     }
 
     sendActionToCell(cellIndex: number, action: CellAction): Grid {
@@ -66,6 +98,10 @@ export class Grid {
         const cell = cells[cellIndex];
 
         cells[cellIndex] = cell[action]();
+
+        if (action === 'dig') {
+            cells[cellIndex].hint = this.countNeighborBombs(cellIndex);
+        }
         return new Grid(this._column, cells);
     }
 

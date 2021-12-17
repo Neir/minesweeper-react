@@ -3,6 +3,7 @@ import { CellStatus } from '../Domain/Cell';
 
 type CellProps = {
     status: CellStatus;
+    hint: number;
     onclick: Function;
 };
 
@@ -31,9 +32,9 @@ export const Cell: React.FunctionComponent<CellProps> = props => {
                 props.onclick(ev);
             }}
             style={cellStyle(props.status)}
-            className="cell"
+            className={`cell ${props.hint > 0 ? 'hint' : ''}`}
         >
-            {emojis[props.status]}
+            { props.hint || emojis[props.status] }
         </div>
     );
 };

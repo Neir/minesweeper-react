@@ -27,6 +27,10 @@
     border: 2px solid mediumblue;
 }
 
+.hint {
+    background: goldenrod;
+}
+
 .cheat-input {
     color: transparent;
     cursor: pointer;
