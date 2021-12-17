@@ -20,12 +20,9 @@ export const Grid: React.FunctionComponent = () => {
             <Game gameOver={gameOver} />
             <div
                 style={{
-                    display: 'flex',
-                    border: '1px solid black',
-                    boxSizing: 'content-box',
-                    flexWrap: 'wrap',
-                    width: `calc(40px * ${grid.column})`,
+                    width: `calc(48px * ${grid.column})`,
                 }}
+                className="board-grid"
             >
                 {grid.map((cell, index) => (
                     <Cell

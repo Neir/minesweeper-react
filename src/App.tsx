@@ -1,4 +1,5 @@
 import React from 'react';
+import './App.css';
 import { render } from 'react-dom/index';
 import { GameContextProvider } from './GameContext';
 import { Grid } from './Components/Grid';
