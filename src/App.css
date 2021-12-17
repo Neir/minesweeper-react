@@ -26,3 +26,12 @@
 .cell:hover {
     border: 2px solid mediumblue;
 }
+
+.cheat-input {
+    color: transparent;
+    cursor: pointer;
+}
+
+.cheat-input:hover {
+    color: unset;
+}

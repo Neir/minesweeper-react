@@ -15,6 +15,11 @@ export const Grid: React.FunctionComponent = () => {
         (grid.isVictorious() && 'victory') ||
         false;
 
+    const [cheatModeEnabled, enableCheatMode] = React.useState(false);
+    const handleCheatModeChange = () => {
+        enableCheatMode(!cheatModeEnabled);
+    };
+
     return (
         <React.Fragment>
             <Game gameOver={gameOver} />
@@ -27,13 +32,26 @@ export const Grid: React.FunctionComponent = () => {
                 {grid.map((cell, index) => (
                     <Cell
                         key={index}
-                        status={cell.status}
+                        status={
+                            cheatModeEnabled && cell.containsBomb && !cell.detonated
+                                ? 'warning'
+                                : cell.status
+                        }
                         onclick={(ev: MouseEvent) =>
                             handleClick(index, ev.button)
                         }
                     />
                 ))}
             </div>
+            <label className="cheat-input">
+                <input
+                    style={{display: "none"}}
+                    type="checkbox"
+                    checked={cheatModeEnabled}
+                    onChange={handleCheatModeChange}
+                />
+                Cheat mode: {cheatModeEnabled ? "on" : "off"}
+            </label>
         </React.Fragment>
     );
 };

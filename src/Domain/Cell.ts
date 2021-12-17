@@ -1,4 +1,4 @@
-export type CellStatus = 'untouched' | 'flagged' | 'dug' | 'detonated';
+export type CellStatus = 'untouched' | 'flagged' | 'dug' | 'detonated' | 'warning';
 export type CellAction = 'dig' | 'flag';
 
 export class Cell {
@@ -41,6 +41,10 @@ export class Cell {
 
     get dug(): boolean {
         return this._dug;
+    }
+
+    get containsBomb(): boolean {
+        return this._bomb;
     }
 
     get status(): CellStatus {

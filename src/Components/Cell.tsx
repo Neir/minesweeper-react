@@ -11,6 +11,7 @@ const emojis = {
     dug: '',
     flagged: '🚩',
     detonated: '💥',
+    warning: '⚠️',
 };
 
 const cellStyle = (status: CellStatus): React.CSSProperties => ({

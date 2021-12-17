@@ -79,7 +79,7 @@ export class Grid {
     isVictorious = () => {
         for (let cell of this) {
             if (
-                (cell.dug === false && cell.flagged === false) ||
+                (cell.dug === false && cell.containsBomb === false) ||
                 cell.detonated === true
             ) {
                 return false;
