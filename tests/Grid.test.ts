@@ -13,11 +13,7 @@ describe(Grid, () => {
     describe('cellIndexByCoordinates', () => {
         test('it get the first cell in grid when asking for x:0 y:0', () => {
             const cells = [
-                expected,
-                unexpected,
-                unexpected,
-                unexpected,
-                unexpected,
+                expected, unexpected, unexpected, unexpected, unexpected,
             ];
             const grid = new Grid(5, cells);
 
@@ -26,25 +22,27 @@ describe(Grid, () => {
 
         test('it get the last cell in grid when asking for x:3 y:1', () => {
             const cells = [
-                unexpected,
-                unexpected,
-                unexpected,
-                unexpected,
-                unexpected,
-                unexpected,
-                unexpected,
-                expected,
+                unexpected, unexpected, unexpected, unexpected,
+                unexpected, unexpected, unexpected, expected,
             ];
             const grid = new Grid(4, cells);
 
             expect(cells[grid.cellIndexByCoordinates(3, 1)]).toBe(expected);
         });
 
-        test('it return -1 when the coordinates are out of the grid', () => {
+        test('it return -1 when x coordinate is out of the grid', () => {
             const grid = new Grid(1, [
                 unexpected,
                 unexpected,
                 unexpected,
+            ]);
+
+            expect(grid.cellIndexByCoordinates(1, 1)).toBe(-1);
+        });
+
+        test('it return -1 when y coordinate is out of the grid', () => {
+            const grid = new Grid(3, [
+                unexpected, unexpected, unexpected,
             ]);
 
             expect(grid.cellIndexByCoordinates(1, 1)).toBe(-1);

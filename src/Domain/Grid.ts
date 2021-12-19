@@ -5,7 +5,7 @@ export type Cells = Array<Cell>;
 export class Grid {
     [key: number]: number;
     private readonly _column: number;
-    private _cells: Cells;
+    private readonly _cells: Cells;
 
     static generate(row: number, column: number, minesCount: number): Grid {
         const length = row * column;
@@ -65,7 +65,8 @@ export class Grid {
     }
 
     cellIndexByCoordinates(x: number, y: number): number {
-        if (x < 0 || x >= this.column || y < 0 || y >= this.column) {
+        const row = this._cells.length / this.column;
+        if (x < 0 || x >= this.column || y < 0 || y >= row) {
             return -1;
         }
         return this.column * y + x;

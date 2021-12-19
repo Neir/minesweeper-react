@@ -34,7 +34,11 @@ export const Cell: React.FunctionComponent<CellProps> = props => {
             style={cellStyle(props.status)}
             className={`cell ${props.hint > 0 ? 'hint' : ''}`}
         >
-            { props.hint > 0 ?  props.hint : emojis[props.status] }
+            {
+                props.hint > 0 && props.status !== 'detonated' ?
+                props.hint :
+                emojis[props.status]
+            }
         </div>
     );
 };
