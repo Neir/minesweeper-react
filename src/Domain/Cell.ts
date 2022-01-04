@@ -1,5 +1,5 @@
 export type CellStatus = 'untouched' | 'flagged' | 'dug' | 'detonated' | 'warning';
-export type CellAction = 'dig' | 'flag';
+export type CellAction = 'dig' | 'flag' | 'undo';
 
 export class Cell {
     private _bomb: boolean;

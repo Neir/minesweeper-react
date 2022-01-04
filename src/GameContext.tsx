@@ -5,14 +5,25 @@ import { Grid } from './Domain/Grid';
 type GameContextProps = {
     grid: Grid;
     updateGridCellStatus: (index: number, status: CellAction) => void;
+    score: { score: number };
 };
 
 type GridCustomHook = [Grid, (index: number, action: CellAction) => void];
 
+const ROW = 10;
+const COLUMN = 15;
+const MINE_COUNT = 15;
+const initialGrid = Grid.generate(ROW, COLUMN, MINE_COUNT);
+
+const _score = { score: ROW * COLUMN };
 const initialContext: GameContextProps = {
-    grid: Grid.generate(10, 15, 10),
+    grid: initialGrid,
     updateGridCellStatus: () => {},
+    score: _score
 };
+
+const gridsHistory: Grid[] = [initialGrid];
+
 
 const useStateGridCells = (initialValue: Grid): GridCustomHook => {
     const [grid, setGrid] = React.useState(initialValue);
@@ -20,9 +31,9 @@ const useStateGridCells = (initialValue: Grid): GridCustomHook => {
     return [
         grid,
         (index: number, action: CellAction) => {
-            const newGrid = grid.sendActionToCell(index, action);
+            const newGrid = grid.sendActionToCell(index, action, gridsHistory, _score);
             setGrid(newGrid);
-        },
+        }
     ];
 };
 
@@ -36,7 +47,7 @@ export const GameContextProvider: React.FunctionComponent<
     const [grid, updateGridCellStatus] = useStateGridCells(initialContext.grid);
 
     return (
-        <GameContext.Provider value={{ grid, updateGridCellStatus }}>
+        <GameContext.Provider value={{ grid, updateGridCellStatus, score: _score }}>
             {props.children}
         </GameContext.Provider>
     );

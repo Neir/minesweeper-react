@@ -208,7 +208,7 @@ describe(Grid, () => {
         const __ = Cell.withoutBomb();
         const $$ = Cell.withBomb();
 
-        it('it dig only the selected cell when the cell is close to bomb', () => {
+        test('it dig only the selected cell when the cell is close to bomb', () => {
             const cells = [
                 SC, $$, $$,
                 $$, $$, $$,
@@ -231,7 +231,7 @@ describe(Grid, () => {
             ]);
         });
 
-        it('it dig all the cells when the grid contains no bomb', () => {
+        test('it dig all the cells when the grid contains no bomb', () => {
             const cells = [
                 SC, __, __,
                 __, __, __,
@@ -254,7 +254,7 @@ describe(Grid, () => {
             ]);
         });
 
-        it('it dig the neighboring cells without bomb and mark hint on cells close to bomb', () => {
+        test('it dig the neighboring cells without bomb and mark hint on cells close to bomb', () => {
             const cells = [
                 SC, __, $$,
                 __, __, $$,

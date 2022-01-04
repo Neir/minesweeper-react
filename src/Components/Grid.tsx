@@ -4,10 +4,20 @@ import { Cell } from './Cell';
 import { Game } from './Game';
 
 export const Grid: React.FunctionComponent = () => {
-    const { grid, updateGridCellStatus } = React.useContext(GameContext);
+    const { grid, updateGridCellStatus, score } = React.useContext(GameContext);
 
-    const handleClick = (index: number, button: number) => {
+    const handleCellClick = (index: number, button: number) => {
         updateGridCellStatus(index, button === 0 ? 'dig' : 'flag');
+    };
+
+    const [cheatModeEnabled, enableCheatMode] = React.useState(false);
+
+    const handleUndoClick = () => {
+        updateGridCellStatus(0, 'undo');
+    };
+
+    const handleCheatModeChange = () => {
+        enableCheatMode(!cheatModeEnabled);
     };
 
     const gameOver =
@@ -15,44 +25,37 @@ export const Grid: React.FunctionComponent = () => {
         (grid.isVictorious() && 'victory') ||
         false;
 
-    const [cheatModeEnabled, enableCheatMode] = React.useState(false);
-    const handleCheatModeChange = () => {
-        enableCheatMode(!cheatModeEnabled);
-    };
-
     return (
         <React.Fragment>
-            <Game gameOver={gameOver} />
-            <div
-                style={{
-                    width: `calc(48px * ${grid.column})`,
-                }}
-                className="board-grid"
-            >
-                {grid.map((cell, index) => (
-                    <Cell
-                        key={index}
-                        status={
-                            cheatModeEnabled && cell.containsBomb && !cell.detonated
-                                ? 'warning'
-                                : cell.status
-                        }
-                        hint={cell.hint}
-                        onclick={(ev: MouseEvent) =>
-                            handleClick(index, ev.button)
-                        }
-                    />
-                ))}
-            </div>
-            <label className="cheat-input">
-                <input
-                    style={{display: "none"}}
-                    type="checkbox"
-                    checked={cheatModeEnabled}
-                    onChange={handleCheatModeChange}
+            <div className='game-container'>
+                <div
+                    style={{
+                        width: `calc(48px * ${grid.column})`,
+                    }}
+                    className='board-grid'
+                >
+                    {grid.map((cell, index) => (
+                        <Cell
+                            key={index}
+                            status={
+                                cheatModeEnabled && cell.containsBomb && !cell.detonated
+                                    ? 'warning'
+                                    : cell.status
+                            }
+                            hint={cell.hint}
+                            onclick={(ev: MouseEvent) =>
+                                handleCellClick(index, ev.button)
+                            }
+                        />
+                    ))}
+                </div>
+                <Game gameOver={gameOver}
+                      cheatModeEnabled={cheatModeEnabled}
+                      handleCheatModeChange={handleCheatModeChange}
+                      handleUndo={handleUndoClick}
+                      score={score}
                 />
-                Cheat mode: {cheatModeEnabled ? "on" : "off"}
-            </label>
+            </div>
         </React.Fragment>
     );
 };
