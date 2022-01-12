@@ -5,25 +5,30 @@ import { Game } from './Game';
 
 export const Grid: React.FunctionComponent = () => {
     const { grid, updateGridCellStatus, score } = React.useContext(GameContext);
+    const [cheatModeEnabled, enableCheatMode] = React.useState(false);
+    const [timerStarted, setTimerStarted] = React.useState(false);
+
+    const gameOver =
+        (grid.isDefeated() && 'defeat') ||
+        (grid.isVictorious() && 'victory') ||
+        false;
 
     const handleCellClick = (index: number, button: number) => {
-        updateGridCellStatus(index, button === 0 ? 'dig' : 'flag');
-    };
-
-    const [cheatModeEnabled, enableCheatMode] = React.useState(false);
-
-    const handleUndoClick = () => {
-        updateGridCellStatus(0, 'undo');
+        if (!gameOver) {
+            updateGridCellStatus(index, button === 0 ? 'dig' : 'flag');
+        }
+        if (!timerStarted) {
+            setTimerStarted(true);
+        }
     };
 
     const handleCheatModeChange = () => {
         enableCheatMode(!cheatModeEnabled);
     };
 
-    const gameOver =
-        (grid.isDefeated() && 'defeat') ||
-        (grid.isVictorious() && 'victory') ||
-        false;
+    const handleUndoClick = () => {
+        updateGridCellStatus(0, 'undo');
+    };
 
     return (
         <React.Fragment>
@@ -53,6 +58,7 @@ export const Grid: React.FunctionComponent = () => {
                       cheatModeEnabled={cheatModeEnabled}
                       handleCheatModeChange={handleCheatModeChange}
                       handleUndo={handleUndoClick}
+                      timerStarted={timerStarted}
                       score={score}
                 />
             </div>

@@ -95,7 +95,7 @@ export class Grid {
             ).length;
     }
 
-    sendActionToCell(cellIndex: number, action: CellAction, gridsHistory: Grid[], score: {score: number}): Grid {
+    sendActionToCell(cellIndex: number, action: CellAction, gridsHistory: Grid[], score: {count: number}): Grid {
         const cells = [...this._cells];
         const cell = cells[cellIndex];
         let newGrid = new Grid(this.column, cells);
@@ -111,13 +111,16 @@ export class Grid {
                 gridsHistory.pop();
                 cells[cellIndex] = cell[action]();
                 gridsHistory.push(newGrid);
+                if (!cell.flagged) {
+                    score.count = score.count - 1;
+                }
                 break;
             case 'undo':
                 if (gridsHistory.length > 1) {
                     newGrid = gridsHistory[gridsHistory.length - 2];
                     const currentGrid = gridsHistory.pop();
                     newGrid = newGrid.copyFlags(currentGrid);
-                    score.score = score.score - 5;
+                    score.count = score.count - 5;
                 }
                 break;
         }

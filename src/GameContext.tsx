@@ -5,7 +5,7 @@ import { Grid } from './Domain/Grid';
 type GameContextProps = {
     grid: Grid;
     updateGridCellStatus: (index: number, status: CellAction) => void;
-    score: { score: number };
+    score: { count: number };
 };
 
 type GridCustomHook = [Grid, (index: number, action: CellAction) => void];
@@ -15,7 +15,7 @@ const COLUMN = 15;
 const MINE_COUNT = 15;
 const initialGrid = Grid.generate(ROW, COLUMN, MINE_COUNT);
 
-const _score = { score: ROW * COLUMN };
+const _score = { count: ROW * COLUMN };
 const initialContext: GameContextProps = {
     grid: initialGrid,
     updateGridCellStatus: () => {},

@@ -4,7 +4,7 @@ import { Grid } from '../src/Domain/Grid';
 describe('Rules', () => {
     const cellWithBomb = Cell.withBomb();
     const cellWithoutBomb = Cell.withoutBomb();
-    const score = {score: 0};
+    const score = {count: 0};
 
     test('a new game is neither lost or won', () => {
         const grid = Grid.generate(1, 1, 0);
@@ -68,5 +68,27 @@ describe('Rules', () => {
 
         const gridRevertedTwice = gridRevertedOnce.sendActionToCell(-1, 'undo', gridHistory, score);
         expect(gridRevertedTwice).toEqual(initialGrid);
+    });
+
+    test('Use a flag reduce the score by 1 point', () => {
+        let grid = new Grid(2, [cellWithoutBomb, cellWithoutBomb, cellWithoutBomb, cellWithBomb]);
+        const gridHistory = [grid];
+        const score = {count: 20};
+
+        grid.sendActionToCell(0, 'flag', gridHistory, score);
+
+        expect(score.count).toEqual(19);
+    });
+
+    test('Undo click reduce the score by 5 points', () => {
+        let grid = new Grid(2, [cellWithoutBomb, cellWithoutBomb, cellWithoutBomb, cellWithBomb]);
+        const gridHistory = [grid];
+        const score = {count: 20};
+
+        grid.sendActionToCell(0, 'dig', gridHistory, score);
+
+        grid.sendActionToCell(-1, 'undo', gridHistory, score);
+
+        expect(score.count).toEqual(15);
     });
 });
